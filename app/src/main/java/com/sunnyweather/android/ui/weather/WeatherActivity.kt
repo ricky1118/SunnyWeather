@@ -1,13 +1,17 @@
 package com.sunnyweather.android.ui.weather
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Layout
 import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.sunnyweather.android.R
@@ -48,12 +52,34 @@ class WeatherActivity : AppCompatActivity() {
             Toast.makeText(this,"无法成功获取天气信息",Toast.LENGTH_SHORT).show()
             result.exceptionOrNull()?.printStackTrace()
         }
+            binding.swipeRefresh.isRefreshing = false//判断是否刷新，下拉刷新
         })
+      //648 649问题1.刷新进度条颜色设置与书中所用方法不同，书中方法会报错误，具体见笔记。
+
+        binding.swipeRefresh.setColorSchemeColors(resources.getColor(R.color.purple_500))//设置刷新进度条颜色
+       refreshWeather()//更新数据，
+        binding.swipeRefresh.setOnRefreshListener { refreshWeather() }//设置下拉刷新监听器，当触发了刷新时就在回调中调用refreshWeather
+   //增加切换城市页面，drawerlayout
+        binding.nowWeatherShow.navBtn.setOnClickListener{
+            binding.draverLayout.openDrawer(GravityCompat.START)
+        }
+        binding.draverLayout.addDrawerListener(object:DrawerLayout.DrawerListener{
+            override fun onDrawerStateChanged(newState: Int) {}
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
+            override fun onDrawerOpened(drawerView: View) {}
+            override fun onDrawerClosed(drawerView: View) {
+                val manager =getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                manager.hideSoftInputFromWindow(drawerView.windowToken,InputMethodManager.HIDE_NOT_ALWAYS)
+            }
+        })
+    }
+//下拉刷新内容的方法
+    private fun refreshWeather(){
         viewModel.refreshWeather(viewModel.locationlng,viewModel.locationlat)
+        binding.swipeRefresh.isRefreshing = true
     }
 
     private fun showWeatherInfo(weather: Weather){
-
     //    val placeName:TextView = findViewById(R.id.placeName)
         binding.nowWeatherShow.placeName.text = viewModel.placeName
     //    placeName.text = viewModel.placeName

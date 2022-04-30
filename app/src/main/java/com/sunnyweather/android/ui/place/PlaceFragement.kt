@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.sunnyweather.android.MainActivity
 import com.sunnyweather.android.databinding.FragmentPlaceBinding
 import com.sunnyweather.android.ui.weather.WeatherActivity
 
@@ -37,8 +38,8 @@ class PlaceFragment :Fragment() {
     //在这里给recyclerview的适配器适配相关数据，并指定linearLayoutmanager
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-    //P647页面
-    if (viewModel.isPlaceSaved()){
+    //P647页面     在  P652页增加一个判断，跳转条件
+    if (activity is MainActivity && viewModel.isPlaceSaved()){
 
         val place = viewModel.getSavedPlace()
         val intent = Intent(context,WeatherActivity::class.java).apply {
